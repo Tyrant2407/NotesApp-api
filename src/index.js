@@ -1,4 +1,5 @@
 import './style/style.css'
 import './components/index.js'
-import './script/home.js'
+import Home from './script/home.js'
 
+Home()

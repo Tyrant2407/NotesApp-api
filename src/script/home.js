@@ -30,6 +30,7 @@ function Home() {
                 hideLoadingSpinner()
             })
     }
+
     const getArchived = () => {
         showLoadingSpinner()
 
@@ -41,9 +42,7 @@ function Home() {
                 if (responseJson.data.length > 0) {
                     render(responseJson.data)
                 } else {
-                    showResponseMessage(
-                        'Catatan pada Archived tidak ditemukan'
-                    )
+                    showResponseMessage('Catatan pada Archived tidak ditemukan')
                     render(responseJson.data)
                 }
             })
@@ -106,27 +105,25 @@ function Home() {
     }
 
     const archiveNote = (id) => {
-      const options = {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          }
-      };
-  
-      fetch(`${baseUrl}/notes/${id}/archive`, options)
-          .then((response) => {
-              return response.json();
-          })
-          .then((responseJson) => {
-              showResponseMessage(responseJson.message);
-              getUnArchived();
-          })
-          .catch((error) => {
-              showResponseMessage(error);
-          });
-    };
-  
-  
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
+
+        fetch(`${baseUrl}/notes/${id}/archive`, options)
+            .then((response) => {
+                return response.json()
+            })
+            .then((responseJson) => {
+                showResponseMessage(responseJson.message)
+                getUnArchived()
+            })
+            .catch((error) => {
+                showResponseMessage(error)
+            })
+    }
 
     const unArchiveNote = async (id) => {
         try {
@@ -201,36 +198,24 @@ function Home() {
         })
     }
 
-    const displayResult = (notesData) => {
-        if (!Array.isArray(notesData)) {
-            console.error('Invalid data format: expected an array')
-            return
-        }
-
-        const notesDataItemElements = notesData.map((notesDataItem) => {
-            const notesDataItemElement =
-                document.createElement('notes-data-item')
-            notesDataItemElement.notesData = notesDataItem
-            return notesDataItemElement
-        })
-
-        Utils.emptyElement(notesDataListElement)
-        notesDataListElement.append(...notesDataItemElements)
-    }
-
     const showSportNotesData = async (query) => {
-      try {
-          const response = await fetch(`${baseUrl}/notes?q=${query}`);
-          if (!response.ok) {
-              throw new Error('Network response was not ok');
-          }
-          const result = await response.json();
-          displayResult(result);
-      } catch (error) {
-          console.error('Error fetching data:', error);
-      }
+        try {
+            const response = await fetch(`${baseUrl}/notes?q=${query}`)
+            if (!response.ok) {
+                throw new Error('Network response was not ok')
+            }
+            const result = await response.json()
+
+            if (result.data.length === 0) {
+                // Jika kosong, tampilkan kembali noteList
+                document.getElementById('noteList').style.display = 'block'
+            } else {
+                document.getElementById('noteList').style.display = 'none'
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error)
+        }
     }
-  
 
     const onSearchHandler = (event) => {
         event.preventDefault()
