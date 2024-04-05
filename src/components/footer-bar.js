@@ -38,7 +38,7 @@ class FooterBar extends HTMLElement {
         this._shadowRoot.appendChild(this._style)
         this._shadowRoot.innerHTML += `      
         <div>
-          Rizky Putra Perdana
+          Rizky Putra Perdana | NotesApi
         </div>
       `
     }

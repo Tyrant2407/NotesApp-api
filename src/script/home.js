@@ -7,7 +7,7 @@ function Home() {
     const searchFormElement = document.querySelector('search-bar')
 
     const getUnArchived = () => {
-        showLoadingSpinner()
+        showLoading()
 
         fetch(`${baseUrl}/notes`)
             .then((response) => {
@@ -27,12 +27,12 @@ function Home() {
                 showResponseMessage(error)
             })
             .finally(() => {
-                hideLoadingSpinner()
+                hideLoading()
             })
     }
 
     const getArchived = () => {
-        showLoadingSpinner()
+        showLoading()
 
         fetch(`${baseUrl}/notes/archived`)
             .then((response) => {
@@ -50,12 +50,12 @@ function Home() {
                 showResponseMessage(error)
             })
             .finally(() => {
-                hideLoadingSpinner()
+                hideLoading()
             })
     }
 
     const addNote = (note) => {
-        showLoadingSpinner()
+        showLoading()
         const options = {
             method: 'POST',
             headers: {
@@ -76,12 +76,12 @@ function Home() {
                 showResponseMessage(error)
             })
             .finally(() => {
-                hideLoadingSpinner()
+                hideLoading()
             })
     }
 
     const removeNote = (noteId) => {
-        showLoadingSpinner()
+        showLoading()
         fetch(`${baseUrl}/notes/${noteId}`, {
             method: 'DELETE',
         })
@@ -100,7 +100,7 @@ function Home() {
                 showResponseMessage(error)
             })
             .finally(() => {
-                hideLoadingSpinner()
+                hideLoading()
             })
     }
 
@@ -125,24 +125,25 @@ function Home() {
             })
     }
 
-    const unArchiveNote = async (id) => {
-        try {
-            const options = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }
-            const response = await fetch(
-                `${baseUrl}/notes/${id}/unarchive`,
-                options
-            )
-            const responseJson = await response.json()
-            showResponseMessage(responseJson.message)
-            getArchived()
-        } catch (error) {
-            showResponseMessage(error)
+    const unArchiveNote = (id) => {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
         }
+
+        fetch(`${baseUrl}/notes/${id}/unarchive`, options)
+            .then((response) => {
+                return response.json()
+            })
+            .then((responseJson) => {
+                showResponseMessage(responseJson.message)
+                getUnArchived()
+            })
+            .catch((error) => {
+                showResponseMessage(error)
+            })
     }
 
     const render = (notes) => {
@@ -154,13 +155,26 @@ function Home() {
             noteItem.classList.add('note-item')
             noteItem.setAttribute('tabindex', '0')
 
-            const noteTitle = document.createElement('h3')
+            const noteTitle = document.createElement('h2')
             noteTitle.classList.add('note-title')
             noteTitle.innerText = note.title
 
             const noteBody = document.createElement('p')
             noteBody.classList.add('note-body')
             noteBody.innerText = note.body
+
+            const noteCreatedAdd = document.createElement('p')
+            noteCreatedAdd.classList.add('note-createdAdd') // Menggunakan classList.add untuk menambahkan class
+            const createdAtDate = new Date(note.createdAt)
+            const createdAtString = createdAtDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric',
+            })
+            noteCreatedAdd.innerText = createdAtString 
 
             const buttonArchived = document.createElement('button')
             buttonArchived.setAttribute('type', 'button')
@@ -193,7 +207,12 @@ function Home() {
             buttonContainer.classList.add('action')
             buttonContainer.append(buttonArchived, buttonTrash)
 
-            noteItem.append(noteTitle, noteBody, buttonContainer)
+            noteItem.append(
+                noteTitle,
+                noteBody,
+                noteCreatedAdd,
+                buttonContainer
+            )
             noteListElement.appendChild(noteItem)
         })
     }
@@ -240,11 +259,11 @@ function Home() {
         filterNotes.selectedIndex = 0
     })
 
-    const showLoadingSpinner = () => {
+    const showLoading = () => {
         document.getElementById('loadingSpinner').style.display = 'block'
     }
 
-    const hideLoadingSpinner = () => {
+    const hideLoading = () => {
         document.getElementById('loadingSpinner').style.display = 'none'
     }
 
